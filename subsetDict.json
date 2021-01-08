@@ -1,0 +1,6 @@
+{
+  "cat": [ "animal", "thing", "mammal" ],
+  "animal": [ "thing" ],
+  "dog": [ "animal", "thing", "mammal" ],
+  "chair": [ "thing" ]
+}
