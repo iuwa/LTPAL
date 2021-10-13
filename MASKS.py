@@ -1,6 +1,6 @@
-import timeit
+# Amirhoshang Hoseinpour Dehkordi
 
-start = timeit.default_timer()
+import timeit
 import json
 from AtomicFormula import AtomicFormula
 from OutputClass import OutputClass
@@ -116,7 +116,7 @@ def MAS_knowledge_sharing(arrayOfOutputClasses, kS, atomicFormulaDict ):
 
 
 # create parental relation for atomic formulas
-def single_framed_knowledge_extraction(atomicFormulaDict, subsetDict):
+def subset_knowledge_extraction(atomicFormulaDict, subsetDict):
     for i in subsetDict:
         if i not in atomicFormulaDict:
             atomicFormulaDict[i]=AtomicFormula(i)
@@ -125,6 +125,7 @@ def single_framed_knowledge_extraction(atomicFormulaDict, subsetDict):
                 atomicFormulaDict[j]=AtomicFormula(j)
             atomicFormulaDict[i].setFather(atomicFormulaDict[j])
     return atomicFormulaDict
+
 
 def token_formula(formula):
     formula1 = ""
@@ -211,7 +212,6 @@ def create_TS(arrayOfkripke):
     return transitionSystem
 
 
-
 def check_LTL_valididity(transitionSystem, formula, pi):
     if len(pi) == 1:
         return 1
@@ -243,9 +243,12 @@ def check_LTL_valididity(transitionSystem, formula, pi):
         #?????????????????????? LTL operators
     return 0
 
-allClasses = []
+
+
+start = timeit.default_timer()
 if __name__=="__main__":
     ### initials ....
+    allClasses = []
     outputDict = {}
     atomicFormulaDict = {}
     with open('subsetDict.json') as f:
@@ -262,7 +265,7 @@ if __name__=="__main__":
 
     ### PAL side
     #this line should be modified ????
-    atomicFormulaDict = single_framed_knowledge_extraction(atomicFormulaDict, subsetDict)
+    atomicFormulaDict = subset_knowledge_extraction(atomicFormulaDict, subsetDict)
     arrayOfkripke = [KripkeModel([0],[(0,0)],{0:[]})]
     for frame in range(classifiersPredictions["len"]):
         classifiers = []
@@ -307,3 +310,6 @@ print("MASKS ended <------------------------------------")
 stop = timeit.default_timer()
 
 print('Time: ', stop - start)  
+
+
+# config file and a file for each frame, each classifier. 
