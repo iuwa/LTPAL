@@ -11,6 +11,7 @@ class TransisionSystem:
     L = {}
     arrowProbability = {}
     len = 0
+
     def __init__(self, S, R, s_0, s_1, Arrow, L):
         self.S = S
         self.R = R
@@ -97,6 +98,15 @@ class TransisionSystem:
             if len(i) == self.len:
                 tempPathes.append(i)
         return tempPathes
+
+    def get_path_names(self, path):
+        res_list = []
+        for i in path:
+            temp_names = []
+            for j in self.L[i]:
+                temp_names.append(j.get_json()["name"])
+            res_list.append(temp_names)
+        return res_list
 
     def get_dict(self):
         outDict = {}

@@ -1,9 +1,10 @@
 {
-  "formulas_LTPAL": [ "X_iU_i(cat,chair)", "X_i&(K_i~&(cat,dog),cat)" ],
+  "formulas_LTPAL": [ "X_iU_i(cat,chair)", "X_i&(K_i~&(cat,dog),cat)", "X_ichair" , "X_idog" ],
   "formulas_PAL": [ "&(K_i~&(cat,dog),cat)" ],
   "allClasses": [ "cat", "dog", "chair" ],
-  "len": 2,
-  "ids": [ "1", "2" ],
+  "overlapTresh": 0.5,
+  "number_of_frames": 2,
+  "classifiers_ids": [ "1", "2" ],
   "1": [
     [
       {

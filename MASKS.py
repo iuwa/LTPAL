@@ -7,16 +7,28 @@ from OutputClass import OutputClass
 from Point import Point
 from KripkeModel import KripkeModel
 from TransisionSystem import TransisionSystem
+import copy
 #from MyGame import *
 
-print("MASKS started ---------------------------------->")
+output_log_file = open("output_log_file.log", 'w')
 
-overlapTresh = 0.5
+
+def print_log(s):
+    output_log_file.write(str(s)+"\n")
+    print(str(s))
+
+print_log("MASKS started ---------------------------------->")
+
+# overlapTresh = 0.5
 
 
 
 class Formulas:
     pass
+
+
+
+
 
 
 def powerset(s):
@@ -100,7 +112,7 @@ def MAS_knowledge_sharing(arrayOfOutputClasses, kS, atomicFormulaDict ):
     for kSPs in kSPowerSet:
         if len(kSPs) > 1:
             ols = overlapOfList(kSPs, arrayOfOutputClasses)
-            if ols < overlapTresh:
+            if ols <= overlapTresh:
                 kSPowerSetOL.append(kSPs)
         elif len(kSPs) == 1:
             kSPowerSetOL.append(kSPs)
@@ -258,59 +270,89 @@ if __name__=="__main__":
     allClasses = classifiersPredictions["allClasses"]
     formulas_PAL = classifiersPredictions["formulas_PAL"]
     formulas_LTPAL = classifiersPredictions["formulas_LTPAL"]
+    overlapTresh = classifiersPredictions["overlapTresh"]
 
     ### Create Atomic formulas
     for i in allClasses:
         atomicFormulaDict[i] = AtomicFormula(i)
 
     ### PAL side
-    #this line should be modified ????
+    #this line should be modified ???? too much fathers willbe added
+    print_log("__________Refine Krikpke Model using formulas_PAL_______________")
     atomicFormulaDict = subset_knowledge_extraction(atomicFormulaDict, subsetDict)
     arrayOfkripke = [KripkeModel([0],[(0,0)],{0:[]})]
-    for frame in range(classifiersPredictions["len"]):
-        classifiers = []
-        for tempClassifier in classifiersPredictions["ids"]:
-            classifiers.append(classifiersPredictions[tempClassifier][frame])
+    for frame_id in range(classifiersPredictions["number_of_frames"]):
+        print_log("__________Creating Krikpke Model for frame: "+str(frame_id)+"_______________")
+        classifiers_prediction = []
+        for tempClassifier in classifiersPredictions["classifiers_ids"]:
+            classifiers_prediction.append(classifiersPredictions[tempClassifier][frame_id])
+        print_log("__________classifiers_prediction_______________")
+        print_log(classifiers_prediction)
+        
         arrayOfOutputClasses = []
-        for classifier in classifiers:
-            is_verified, arrayOfOutputClass = classifier_knowledge_calculator(classifier)
+        for classifier_prediction in classifiers_prediction:
+            is_verified, arrayOfOutputClass = classifier_knowledge_calculator(classifier_prediction)
             arrayOfOutputClasses.append(arrayOfOutputClass)
+        print_log("__________arrayOfOutputClasses_______________")
+        print_log(arrayOfOutputClasses)
         is_verified, kS, arrayOfOutputClasses = MAS_knowledge_aggregator(arrayOfOutputClasses, )
+        print_log("__________Intersected arrayOfOutputClasses_______________")
+        print_log(arrayOfOutputClasses)
         is_verified, kripke = MAS_knowledge_sharing(arrayOfOutputClasses, kS, atomicFormulaDict )
+        kripke_temp = copy.deepcopy(kripke)
         for formula in formulas_PAL:
             remove_list, kripke = MAS_formula_extraction(kripke, formula)
-            print("The input formula: "+formula+" is removed list: "+str(remove_list)+" of worlds in the kripke: "+str(kripke))
+            if remove_list:
+                print_log("The input formula: "+formula+" removed list of worlds: "+str(remove_list)+" with names "+
+                str(kripke_temp.getVName(remove_list))+" in the kripke Model of frame: "+str(frame_id))
+            else:
+                print_log("no world removed by PAL formula for frame number: "+str(frame_id))
         arrayOfkripke.append(kripke)
 
+        print_log("__________kripke_______________ for frame number: "+str(frame_id))
+        print_log(kripke)
     arrayOfkripke.append(KripkeModel([-1],[(-1,-1)],{-1:[]}))
 
     #print("The Kripke model is: "+str(arrayOfkripke))
 
     transitionSystem = create_TS(arrayOfkripke)
-
+    print_log("__________Paths_______________")
+    pathes = []
+    s_0 = (0,0)
+    pathes = transitionSystem.get_all_pathes()
+    print_log(pathes)
+    print_log("__________Validating Formulas_______________")
     for formula in formulas_LTPAL:
-        s_0 = (0,0)
-        pathes = transitionSystem.get_all_pathes()
-        print("__________PATHES_______________")
-        print(pathes)
         is_v = 0
+        exists = False
+        forall = True
         for pi in pathes:
             is_v = check_LTL_valididity(transitionSystem, formula, pi)
-            print("The input formula is evaluated: "+str(is_v)+" in the path: "+str(pi))
-    print("The Transition System model is: "+str(transitionSystem))
+            if not exists and is_v:
+                exists = True
+            if forall and not is_v:
+                forall = False
+            print_log("The input formula: "+formula+" is evaluated: "+str(is_v)+" in the path: "+str(pi))
+        if forall:
+            print_log("The input formula: "+formula+" is --verified-- for all paths")
+        if exists:
+            print_log("The input formula: "+formula+" is --possible-- in some paths")
+    print_log("The Transition System model with Probabilities is: "+str(transitionSystem))
     outDict = transitionSystem.get_dict()
     outProb = transitionSystem.get_most_probable_path()
-    print("+++++++++++++++++++++++++++++")
-    print(outProb)
+    print_log("__________most_probable_path_______________")
+    print_log(outProb)
+    print_log("__________most_probable_path_labels_______________")
+    print_log(transitionSystem.get_path_names(outProb))
     with open('result.json', 'w') as fp:
         json.dump(outDict, fp)
     #run_anim()
-
-print("MASKS ended <------------------------------------")
 stop = timeit.default_timer()
 
-print('Time: ', stop - start)  
+print_log('runtime: '+ str(stop - start) + " seconds")  
 
+
+print_log("MASKS ended <------------------------------------")
 
 # config file and a file for each frame, each classifier. 
 # get and verify formulas!!

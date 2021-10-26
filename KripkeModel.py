@@ -26,6 +26,14 @@ class KripkeModel:
             self.R.remove(i)
         self.V.pop(w)
 
+    def getVName(self, temp_list):
+        res_list = []
+        for i in temp_list:
+            temp_names = []
+            for j in self.V[i]:
+                temp_names.append(j.get_json()["name"])
+            res_list.append(temp_names)
+        return res_list
 
     def __repr__(self):
         return "(\nW="+str(self.W)+",\nR="+str(self.R)+",\nV="+str(self.V)+")" 
