@@ -313,3 +313,5 @@ print('Time: ', stop - start)
 
 
 # config file and a file for each frame, each classifier. 
+# get and verify formulas!!
+# 
