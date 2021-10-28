@@ -3,7 +3,7 @@
 ## Linear Temporal Public Announcement Logic: a new perspective for reasoning about the knowledge of multi-classifiers
 
 
-We developed the LTPAL tool is developed to verify the properties of multiple classifiers. Here, properties would appear in the form of LTPAL formulas. Such properties could be investigated for single-framed data (i.e., images) or data-streams (i.e., videos). 
+We developed the LTPAL tool to verify the properties of multiple classifiers. Here, properties would appear in the form of LTPAL formulas. Such properties could be investigated for single-framed data (i.e., images) or data-streams (i.e., videos). 
 
 ## Input
 
